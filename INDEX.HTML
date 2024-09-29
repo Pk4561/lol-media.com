@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOL Media</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; color: #333; }
+        header { background: #4caf50; color: white; padding: 20px; text-align: center; }
+        .container { padding: 20px; max-width: 600px; margin: auto; }
+        .form-section, .post-section { margin-bottom: 20px; padding: 20px; background: white; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+        input[type="text"], input[type="email"], input[type="password"], input[type="textarea"] { width: calc(100% - 22px); padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+        button { width: 100%; color: white; padding: 10px; border: none; border-radius: 5px; background: #4caf50; cursor: pointer; }
+        button:hover { background: #388e3c; }
+        .post { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
+        .post-actions { display: flex; justify-content: space-between; margin-top: 10px; }
+        .follow-section { margin-top: 10px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>LOL Media</h1>
+</header>
+
+<div class="container">
+
+    <!-- Signup Section -->
+    <div class="form-section" id="signup-section">
+        <h2>Sign Up</h2>
+        <input type="text" id="signup-username" placeholder="Username" required>
+        <input type="email" id="signup-email" placeholder="Email" required>
+        <input type="password" id="signup-password" placeholder="Password" required>
+        <button onclick="signup()">Sign Up</button>
+    </div>
+
+    <!-- Login Section -->
+    <div class="form-section" id="login-section">
+        <h2>Login</h2>
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-password" placeholder="Password" required>
+        <button onclick="login()">Login</button>
+    </div>
+
+    <!-- Post Section -->
+    <div class="post-section hidden" id="post-section">
+        <h2>Create a Post</h2>
+        <input type="text" id="post-caption" placeholder="Write a caption..." required>
+        <button onclick="createPost()">Post</button>
+
+        <h3>Posts</h3>
+        <div id="post-list"></div>
+    </div>
+
+</div>
+
+<script>
+    let currentUsername = '';
+    let posts = [];
+
+    // Store user session data in localStorage
+    function saveSession(username) {
+        localStorage.setItem('currentUsername', username);
+    }
+
+    function loadSession() {
+        const savedUsername = localStorage.getItem('currentUsername');
+        if (savedUsername) {
+            currentUsername = savedUsername;
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('signup-section').classList.add('hidden');
+            document.getElementById('post-section').classList.remove('hidden');
+            fetchPosts();
+        }
+    }
+
+    window.onload = loadSession; // Auto-load session on page load
+
+    // Mock function to sign up (saving to localStorage)
+    function signup() {
+        const username = document.getElementById('signup-username').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+
+        if (username && email && password) {
+            const userData = { username, email, password };
+            localStorage.setItem(email, JSON.stringify(userData)); // Store user data in localStorage
+            alert("Sign up successful! You can now log in.");
+        } else {
+            alert("Please fill out all fields.");
+        }
+    }
+
+    // Mock function to login (validating with localStorage)
+    function login() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        const storedUser = localStorage.getItem(email);
+        if (storedUser) {
+            const userData = JSON.parse(storedUser);
+            if (userData.password === password) {
+                currentUsername = userData.username;
+                saveSession(currentUsername);
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('signup-section').classList.add('hidden');
+                document.getElementById('post-section').classList.remove('hidden');
+                fetchPosts();
+            } else {
+                alert("Incorrect password.");
+            }
+        } else {
+            alert("User not found. Please sign up first.");
+        }
+    }
+
+    // Fetch and Display Posts (Mocked for this demo)
+    function fetchPosts() {
+        const postList = document.getElementById('post-list');
+        postList.innerHTML = '';
+        posts.forEach(post => {
+            const postDiv = document.createElement('div');
+            postDiv.classList.add('post');
+            postDiv.innerHTML = `<strong>${post.username}</strong>: ${post.caption}`;
+            postList.appendChild(postDiv);
+        });
+    }
+
+    // Create a new post
+    function createPost() {
+        const caption = document.getElementById('post-caption').value;
+        if (caption) {
+            posts.push({ username: currentUsername, caption });
+            document.getElementById('post-caption').value = ''; // Clear input
+            fetchPosts(); // Refresh post list
+        } else {
+            alert("Please write a caption before posting.");
+        }
+    }
+
+</script>
+
+</body>
+</html>
